@@ -1,0 +1,238 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700&family=Inter:wght@300;400;500;600;700&family=Amiri:ital,wght@0,400;0,700;1,400&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  /* ─── CIGMA Color Palette (from official logo) ─── */
+
+  /* Navy Blue — primary brand color (matching "CREATIVE INTERNATIONAL ACADEMY" text) */
+  --color-navy-50:  #e8ecf5;
+  --color-navy-100: #c5cfe6;
+  --color-navy-200: #9fb0d5;
+  --color-navy-300: #7890c3;
+  --color-navy-400: #5171b5;
+  --color-navy-500: #2a52a7;
+  --color-navy-600: #1B2472;
+  --color-navy-700: #151c5a;
+  --color-navy-800: #0f1445;
+  --color-navy-900: #0a0e30;
+  --color-navy-950: #060820;
+
+  /* Maroon/Brown — logo ring & accent (matching circular border) */
+  --color-maroon-50:  #fdf0f0;
+  --color-maroon-100: #f8d5d5;
+  --color-maroon-200: #f0aaaa;
+  --color-maroon-300: #e47e7e;
+  --color-maroon-400: #d45555;
+  --color-maroon-500: #b03030;
+  --color-maroon-600: #8B3A3A;
+  --color-maroon-700: #6e2e2e;
+  --color-maroon-800: #522323;
+  --color-maroon-900: #371818;
+
+  /* Forest Green — tree leaves accent */
+  --color-forest-50:  #eef5ee;
+  --color-forest-100: #cfe5cf;
+  --color-forest-200: #a5cfa5;
+  --color-forest-300: #7ab87a;
+  --color-forest-400: #5da05d;
+  --color-forest-500: #4D7C4D;
+  --color-forest-600: #3d6b3d;
+  --color-forest-700: #2e5a2e;
+  --color-forest-800: #204820;
+  --color-forest-900: #133713;
+
+  /* Warm Neutral */
+  --color-warm-50:  #F8F5F0;
+  --color-warm-100: #F0EBE3;
+  --color-warm-200: #E0D5C8;
+  --color-warm-300: #C8B9A8;
+  --color-warm-400: #A89080;
+  --color-warm-500: #896E5E;
+
+  /* Typography */
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-arabic: 'Amiri', serif;
+
+  /* Animations */
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-float-delayed: float 6s ease-in-out infinite 2s;
+  --animate-shimmer: shimmer 2s linear infinite;
+  --animate-pulse-maroon: pulse-maroon 2s ease-in-out infinite;
+  --animate-slide-up: slide-up 0.6s ease-out forwards;
+  --animate-fade-in: fade-in 0.8s ease-out forwards;
+
+  /* Shadows */
+  --shadow-glass: 0 8px 32px rgba(27, 36, 114, 0.2);
+  --shadow-maroon: 0 4px 24px rgba(139, 58, 58, 0.3);
+  --shadow-navy: 0 8px 40px rgba(27, 36, 114, 0.4);
+}
+
+/* ─── Keyframe Animations ─── */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes pulse-maroon {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(139, 58, 58, 0.4); }
+  50% { box-shadow: 0 0 0 12px rgba(139, 58, 58, 0); }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes maroon-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(139, 58, 58, 0.3); }
+  50% { box-shadow: 0 0 40px rgba(139, 58, 58, 0.6); }
+}
+
+/* ─── Base Styles ─── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: #F8F5F0;
+  color: #1B2472;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dark body {
+  background-color: #0a0e30;
+  color: #e8ecf5;
+}
+
+/* ─── Custom Scrollbar ─── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #F0EBE3; }
+::-webkit-scrollbar-thumb { background: #8B3A3A; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #1B2472; }
+
+.dark ::-webkit-scrollbar-track { background: #0f1445; }
+.dark ::-webkit-scrollbar-thumb { background: #8B3A3A; }
+
+/* ─── Glass Morphism ─── */
+.glass {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.glass-navy {
+  background: rgba(27, 36, 114, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(139, 58, 58, 0.3);
+}
+
+/* ─── Gradient Text ─── */
+.text-brand-gradient {
+  background: linear-gradient(135deg, #1B2472, #5171b5, #1B2472);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 3s linear infinite;
+}
+
+.text-maroon-gradient {
+  background: linear-gradient(135deg, #8B3A3A, #d45555, #8B3A3A);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 3s linear infinite;
+}
+
+/* ─── Font Utilities ─── */
+.font-display { font-family: var(--font-display); }
+.font-arabic { font-family: var(--font-arabic); }
+
+/* ─── Gradient Backgrounds ─── */
+.bg-navy-gradient {
+  background: linear-gradient(135deg, #0a0e30 0%, #1B2472 50%, #0a0e30 100%);
+}
+
+.bg-maroon-gradient {
+  background: linear-gradient(135deg, #8B3A3A, #d45555, #8B3A3A);
+}
+
+.bg-hero-gradient {
+  background: linear-gradient(135deg, #0a0e30 0%, #1B2472 40%, #2a52a7 70%, #1B2472 100%);
+}
+
+/* ─── Section Spacing ─── */
+.section-padding {
+  padding: 5rem 0;
+}
+
+@media (max-width: 768px) {
+  .section-padding { padding: 3rem 0; }
+}
+
+/* ─── Animated Underline ─── */
+.animated-underline::after {
+  content: '';
+  display: block;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #8B3A3A, #4D7C4D);
+  transition: width 0.3s ease;
+}
+.animated-underline:hover::after { width: 100%; }
+
+/* ─── Animation Classes ─── */
+.animate-float { animation: var(--animate-float); }
+.animate-float-delayed { animation: var(--animate-float-delayed); }
+.animate-spin-slow { animation: spin-slow 20s linear infinite; }
+.animate-pulse-maroon { animation: var(--animate-pulse-maroon); }
+.animate-maroon-glow { animation: maroon-glow 2s ease-in-out infinite; }
+
+/* ─── Tree Pattern (logo-inspired) ─── */
+.tree-pattern {
+  background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%238B3A3A' fill-opacity='0.06'%3E%3Ccircle cx='40' cy='40' r='30'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* ─── Section Divider ─── */
+.section-divider {
+  height: 4px;
+  background: linear-gradient(90deg, transparent, #8B3A3A, #1B2472, #4D7C4D, transparent);
+  border-radius: 2px;
+}
+
+/* ─── Card Hover Effects ─── */
+.card-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(27, 36, 114, 0.2);
+}

@@ -1,0 +1,163 @@
+import express from 'express'
+import mongoose from 'mongoose'
+import cors from 'cors'
+import helmet from 'helmet'
+import rateLimit from 'express-rate-limit'
+import mongoSanitize from 'express-mongo-sanitize'
+import dotenv from 'dotenv'
+import { getMongoUri } from './devMemoryDb.js'
+import { autoSeedDatabase } from './autoSeed.js'
+
+// Routes
+import authRoutes from './routes/auth.js'
+import inquiryRoutes from './routes/inquiries.js'
+import newsRoutes from './routes/news.js'
+import galleryRoutes from './routes/gallery.js'
+import downloadRoutes from './routes/downloads.js'
+import applicationRoutes from './routes/applications.js'
+import dashboardRoutes from './routes/dashboard.js'
+import attendanceRoutes from './routes/attendance.js'
+import marksRoutes from './routes/marks.js'
+import homeworkRoutes from './routes/homework.js'
+import timetableRoutes from './routes/timetable.js'
+import feesRoutes from './routes/fees.js'
+import notificationsRoutes from './routes/notifications.js'
+import certificateRoutes from './routes/certificates.js'
+import reportRoutes from './routes/reports.js'
+import libraryRoutes from './routes/library.js'
+import transportRoutes from './routes/transport.js'
+import payrollRoutes from './routes/payroll.js'
+import auditRoutes from './routes/audit.js'
+
+dotenv.config()
+
+const app = express()
+const PORT = process.env.PORT || 5000
+
+// ─── Security Middleware ───────────────────────────────────────────────
+app.use(helmet({
+  crossOriginEmbedderPolicy: false,
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'", 'fonts.googleapis.com'],
+      fontSrc: ["'self'", 'fonts.gstatic.com'],
+      imgSrc: ["'self'", 'data:', 'res.cloudinary.com'],
+    },
+  },
+}))
+
+app.use(cors({
+  origin: [
+    'https://creativecigma.com',
+    'https://portal.creativecigma.com',
+    'https://admin.creativecigma.com',
+    'http://localhost:5173',
+    'http://localhost:3000',
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+}))
+
+// Global rate limiter
+app.use(rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100,
+  message: { success: false, message: 'Too many requests, please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+}))
+
+// Stricter limiter for auth routes
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  message: { success: false, message: 'Too many login attempts.' },
+})
+
+app.use(express.json({ limit: '10mb' }))
+app.use(express.urlencoded({ extended: true, limit: '10mb' }))
+app.use((req, res, next) => {
+  if (req.query) {
+    Object.defineProperty(req, 'query', {
+      value: Object.assign({}, req.query),
+      writable: true,
+      configurable: true,
+      enumerable: true
+    })
+  }
+  next()
+})
+app.use(mongoSanitize()) // Prevent NoSQL injection
+
+// ─── Routes ───────────────────────────────────────────────────────────
+app.use('/api/auth', authLimiter, authRoutes)
+app.use('/api/inquiries', inquiryRoutes)
+app.use('/api/news', newsRoutes)
+app.use('/api/gallery', galleryRoutes)
+app.use('/api/downloads', downloadRoutes)
+app.use('/api/applications', applicationRoutes)
+app.use('/api/dashboard', dashboardRoutes)
+app.use('/api/attendance', attendanceRoutes)
+app.use('/api/marks', marksRoutes)
+app.use('/api/homework', homeworkRoutes)
+app.use('/api/timetable', timetableRoutes)
+app.use('/api/fees', feesRoutes)
+app.use('/api/notifications', notificationsRoutes)
+app.use('/api/certificates', certificateRoutes)
+app.use('/api/reports', reportRoutes)
+app.use('/api/library', libraryRoutes)
+app.use('/api/transport', transportRoutes)
+app.use('/api/payroll', payrollRoutes)
+app.use('/api/audit', auditRoutes)
+
+// Health check
+app.get('/api/health', (_req, res) => {
+  res.json({ success: true, message: 'CIGMA API is running', timestamp: new Date().toISOString() })
+})
+
+// ─── Error Handler ─────────────────────────────────────────────────────
+// eslint-disable-next-line no-unused-vars
+app.use((err, _req, res, _next) => {
+  const isProduction = process.env.NODE_ENV === 'production'
+  const status = err.statusCode || err.status || 500
+  const message = err.message || 'Internal server error'
+  
+  if (!isProduction) console.error('Error:', err)
+  
+  res.status(status).json({ 
+    success: false, 
+    message: isProduction && status === 500 ? 'Internal Server Error' : message 
+  })
+})
+
+// 404 handler
+app.use((_req, res) => {
+  res.status(404).json({ success: false, message: 'Route not found' })
+})
+
+// ─── Database Connection ────────────────────────────────────────────────
+async function startServer() {
+  try {
+    const mongoUri = await getMongoUri()
+    if (!mongoUri) throw new Error('MONGODB_URI is not defined in environment variables')
+
+    await mongoose.connect(mongoUri)
+    console.log('✅ Connected to MongoDB')
+
+    // Auto-seed database if empty (useful for dev/in-memory DBs)
+    await autoSeedDatabase()
+
+    app.listen(PORT, () => {
+      console.log(`🚀 CIGMA API Server running on port ${PORT}`)
+      console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`)
+    })
+  } catch (error) {
+    console.error('❌ Failed to start server:', error)
+    process.exit(1)
+  }
+}
+
+startServer()
+
+export default app

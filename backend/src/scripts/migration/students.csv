@@ -1,0 +1,2 @@
+admissionNo,name,email,phone,dateOfBirth,gender,address,grade,section,bloodGroup,parentEmail
+ADM2026001,John Doe,john@example.com,9876543210,2010-05-14,Male,123 Main St,10,A,O+,parent@example.com

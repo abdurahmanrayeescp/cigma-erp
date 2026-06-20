@@ -37,3 +37,19 @@ This guide provides instructions for deploying CIGMA ERP Version 1.0 to Vercel (
    node src/scripts/migrateRealData.js
    ```
 2. Save the `migration_credentials.txt` securely.
+
+## 5. Custom Domain Configuration (creativecigma.com)
+For the production go-live, the domain structure must be configured as follows:
+
+| Subdomain | Target Service | Hosting Platform | DNS Record Type |
+| :--- | :--- | :--- | :--- |
+| `creativecigma.com` | Public Website | Vercel (Frontend) | `A` record (to Vercel IP) or `CNAME` |
+| `portal.creativecigma.com` | User Portal | Vercel (Frontend) | `CNAME` (pointing to `cname.vercel-dns.com`) |
+| `admin.creativecigma.com` | Admin Portal | Vercel (Frontend) | `CNAME` (pointing to `cname.vercel-dns.com`) |
+| `api.creativecigma.com` | Express Backend API | Railway (Backend) | `CNAME` (pointing to Railway domain host) |
+
+### SSL & HTTPS Redirection
+1. **SSL Certificates:** Automatically provisioned by Vercel and Railway via Let's Encrypt once DNS records propagate.
+2. **HTTPS Redirection:** Enforced at the platform level (both Vercel's Edge routing and Railway's ingress proxy will automatically upgrade all HTTP requests to HTTPS).
+3. **Subdomain Routing:** The frontend Single Page Application (SPA) uses path and host detection or a single compiled build mapped to multiple domains in Vercel to route traffic seamlessly.
+

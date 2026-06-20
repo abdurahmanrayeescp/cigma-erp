@@ -7,6 +7,7 @@ import mongoSanitize from 'express-mongo-sanitize'
 import dotenv from 'dotenv'
 import { getMongoUri } from './devMemoryDb.js'
 import { autoSeedDatabase } from './autoSeed.js'
+import { logger } from './utils/logger.js'
 
 // Routes
 import authRoutes from './routes/auth.js'
@@ -28,8 +29,27 @@ import libraryRoutes from './routes/library.js'
 import transportRoutes from './routes/transport.js'
 import payrollRoutes from './routes/payroll.js'
 import auditRoutes from './routes/audit.js'
+import studentRoutes from './routes/students.js'
+import teacherRoutes from './routes/teachers.js'
+import academicsRoutes from './routes/academics.js'
+import systemRoutes from './routes/system.js'
 
 dotenv.config()
+
+// Global process error handlers to capture uncaughtException and unhandledRejection
+process.on('uncaughtException', (err) => {
+  logger.error('Uncaught Exception occurred', err)
+})
+
+process.on('unhandledRejection', (reason, promise) => {
+  const err = reason instanceof Error ? reason : new Error(String(reason))
+  logger.error('Unhandled Rejection occurred', err)
+})
+
+// Listen to Mongoose connection errors
+mongoose.connection.on('error', (err) => {
+  logger.error('MongoDB Connection Error', err)
+})
 
 const app = express()
 const PORT = process.env.PORT || 5000
@@ -110,6 +130,10 @@ app.use('/api/library', libraryRoutes)
 app.use('/api/transport', transportRoutes)
 app.use('/api/payroll', payrollRoutes)
 app.use('/api/audit', auditRoutes)
+app.use('/api/students', studentRoutes)
+app.use('/api/teachers', teacherRoutes)
+app.use('/api/academics', academicsRoutes)
+app.use('/api/system', systemRoutes)
 
 // Health check
 app.get('/api/health', (_req, res) => {
@@ -118,12 +142,18 @@ app.get('/api/health', (_req, res) => {
 
 // ─── Error Handler ─────────────────────────────────────────────────────
 // eslint-disable-next-line no-unused-vars
-app.use((err, _req, res, _next) => {
+app.use((err, req, res, _next) => {
   const isProduction = process.env.NODE_ENV === 'production'
   const status = err.statusCode || err.status || 500
   const message = err.message || 'Internal server error'
   
-  if (!isProduction) console.error('Error:', err)
+  // Pipe all Express API / controller errors (Authentication, API, Database, PDF, Cloudinary, etc.) to logger.error
+  logger.error(`API Error: ${message} (Status: ${status})`, err, {
+    url: req.originalUrl,
+    method: req.method,
+    ip: req.ip,
+    user: req.user ? req.user.id : null,
+  })
   
   res.status(status).json({ 
     success: false, 
@@ -153,6 +183,7 @@ async function startServer() {
       console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`)
     })
   } catch (error) {
+    logger.error('❌ Failed to start server:', error)
     console.error('❌ Failed to start server:', error)
     process.exit(1)
   }

@@ -1,0 +1,35 @@
+# Node dependencies
+node_modules/
+.npm
+.cache/
+backend/node_modules/.cache/
+
+# Production builds
+dist/
+build/
+
+# Credentials and secrets
+.env
+.env.production
+.env.local
+.env.development
+migration_credentials.txt
+
+# Backups & dumps
+backups/
+*.archive
+db_backups/
+
+# Logs
+logs/
+*.log
+
+# Editor configurations
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Temporary uploads
+uploads/
+tmp/

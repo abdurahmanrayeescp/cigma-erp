@@ -41,6 +41,7 @@ import StudentAttendancePage from '@/pages/portal/StudentAttendancePage'
 // Marks Pages
 import AdminMarksAnalytics from '@/pages/portal/AdminMarksAnalytics'
 import TeacherMarksPage from '@/pages/portal/TeacherMarksPage'
+import TeacherClassesPage from '@/pages/portal/TeacherClassesPage'
 import ParentResultsPage from '@/pages/portal/ParentResultsPage'
 import StudentResultsPage from '@/pages/portal/StudentResultsPage'
 
@@ -80,6 +81,14 @@ import TeacherPayslipPage from '@/pages/portal/TeacherPayslipPage'
 
 // Audit
 import AdminAuditLogsPage from '@/pages/portal/AdminAuditLogsPage'
+
+// New Admin Portal Pages
+import AdminStudentsPage from '@/pages/portal/AdminStudentsPage'
+import AdminTeachersPage from '@/pages/portal/AdminTeachersPage'
+import AdminAcademicsPage from '@/pages/portal/AdminAcademicsPage'
+import AdminAttendancePage from '@/pages/portal/AdminAttendancePage'
+import AdminTimetablePage from '@/pages/portal/AdminTimetablePage'
+import AdminSettingsPage from '@/pages/portal/AdminSettingsPage'
 
 // PWA Component
 import PwaPrompt from '@/components/ui/PwaPrompt'
@@ -131,21 +140,26 @@ function AppRoutes() {
           <Route element={<DashboardLayout />}>
             <Route path="admin" element={<ProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN']} />}>
               <Route index element={<AdminDashboard />} />
+              <Route path="students" element={<AdminStudentsPage />} />
+              <Route path="teachers" element={<AdminTeachersPage />} />
+              <Route path="academics" element={<AdminAcademicsPage />} />
+              <Route path="attendance" element={<AdminAttendancePage />} />
               <Route path="marks" element={<AdminMarksAnalytics />} />
               <Route path="fees" element={<AdminFeesPage />} />
+              <Route path="timetable" element={<AdminTimetablePage />} />
               <Route path="notifications" element={<AdminNotificationsPage />} />
-              <Route path="certificates" element={<AdminCertificatesPage />} />
               <Route path="certificates" element={<AdminCertificatesPage />} />
               <Route path="reports" element={<AdminReportsPage />} />
               <Route path="library" element={<AdminLibraryPage />} />
               <Route path="transport" element={<AdminTransportPage />} />
               <Route path="payroll" element={<AdminPayrollPage />} />
               <Route path="audit" element={<AdminAuditLogsPage />} />
-              {/* Other admin routes will go here */}
+              <Route path="settings" element={<AdminSettingsPage />} />
             </Route>
             <Route path="teacher" element={<ProtectedRoute allowedRoles={['TEACHER']} />}>
               <Route index element={<TeacherDashboard />} />
               <Route path="attendance" element={<TeacherAttendancePage />} />
+              <Route path="classes" element={<TeacherClassesPage />} />
               <Route path="marks" element={<TeacherMarksPage />} />
               <Route path="homework" element={<TeacherHomeworkPage />} />
               <Route path="timetable" element={<TeacherTimetablePage />} />

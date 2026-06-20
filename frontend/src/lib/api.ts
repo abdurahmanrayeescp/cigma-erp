@@ -54,6 +54,13 @@ export const authApi = {
   refresh: () => request<{ accessToken: string }>('/auth/refresh', { method: 'POST' }),
 
   me: () => get<{ success: boolean; data: { id: string; name: string; email: string; role: string } }>('/auth/me'),
+  changePassword: (currentPassword: string, newPassword: string) =>
+    post<{ success: boolean; message: string }>('/auth/change-password', { currentPassword, newPassword }),
+}
+
+// ─── Dashboard ────────────────────────────────────────────────────────────
+export const dashboardApi = {
+  getAdminStats: () => get<{ success: boolean; data: any }>('/dashboard/admin/stats'),
 }
 
 // ─── Inquiries (Contact & Admission forms) ────────────────────────────────
@@ -234,7 +241,7 @@ export const timetableApi = {
   getTeacherTimetable: (teacherId: string = 'me') =>
     get<{ success: boolean; data: any[] }>(`/timetable/teacher/${teacherId}`),
   createTimetable: (payload: { classId: string; day: string; period: number; subject: string; teacherId?: string; startTime: string; endTime: string }) =>
-    post<{ success: boolean; data: any }>('/timetable', payload),
+    post<{ success: boolean; data?: any; message?: string }>('/timetable', payload),
   deleteTimetable: (id: string) =>
     request(`/timetable/${id}`, { method: 'DELETE' }),
 }
@@ -252,4 +259,22 @@ export const notificationApi = {
   markAsRead: (id: string) => put<{ success: boolean; data: any }>(`/notifications/${id}/read`, {}),
   createNotification: (payload: { title: string; message: string; targetAudience: string }) =>
     post<{ success: boolean; data: any }>('/notifications', payload),
+}
+
+// ─── Students & Teachers ──────────────────────────────────────────────────
+export const studentsApi = {
+  list: () => get<{ success: boolean; data: any[] }>('/students'),
+  get: (id: string) => get<{ success: boolean; data: any }>(`/students/${id}`),
+}
+
+export const teachersApi = {
+  list: () => get<{ success: boolean; data: any[] }>('/teachers'),
+  get: (id: string) => get<{ success: boolean; data: any }>(`/teachers/${id}`),
+  getMyClasses: () => get<{ success: boolean; data: { myClasses: any[]; allClasses: any[] } }>('/teachers/my-classes'),
+  getClassStudents: (classId: string) => get<{ success: boolean; data: any[] }>(`/teachers/class-students/${classId}`),
+}
+
+export const academicsApi = {
+  getClasses: () => get<{ success: boolean; data: any[] }>('/academics/classes'),
+  getSubjects: () => get<{ success: boolean; data: any[] }>('/academics/subjects'),
 }

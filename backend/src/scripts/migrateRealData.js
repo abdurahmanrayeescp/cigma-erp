@@ -7,7 +7,7 @@ import bcrypt from 'bcryptjs'
 import csv from 'csv-parser'
 
 // Adjust models import based on actual paths
-import { User, Student, Teacher, Parent, Class, Subject, Book, TransportRoute, Payroll, News } from '../models/index.js'
+import { User, Student, Teacher, Parent, Class, Subject, Book, TransportRoute, Payroll, NewsEvent } from '../models/index.js'
 
 dotenv.config()
 
@@ -45,19 +45,19 @@ const migrate = async () => {
     
     // Create Super Admin if not exists
     const adminEmail = 'admin@creativecigma.com'
-    const existingAdmin = await User.findOne({ email: adminEmail })
+    let existingAdmin = await User.findOne({ email: adminEmail })
     if (!existingAdmin) {
       const password = generatePassword()
       const hashedPassword = await bcrypt.hash(password, 10)
-      const admin = await User.create({
-        loginId: 'admin',
+      existingAdmin = await User.create({
+        username: 'admin',
         name: 'Super Admin',
         email: adminEmail,
         password: hashedPassword,
         role: 'SUPER_ADMIN',
         isActive: true
       })
-      credentials.push(`SUPER_ADMIN: loginId=${admin.loginId}, password=${password}`)
+      credentials.push(`SUPER_ADMIN: username=${existingAdmin.username}, password=${password}`)
       console.log('Super Admin created.')
     }
 
@@ -66,17 +66,22 @@ const migrate = async () => {
     for (const t of teachersData) {
       const existing = await Teacher.findOne({ employeeId: t.employeeId })
       if (!existing) {
-        const password = generatePassword()
-        const hashedPassword = await bcrypt.hash(password, 10)
+        let user = await User.findOne({ username: t.employeeId })
+        let password = 'PasswordExists'
         
-        const user = await User.create({
-          loginId: t.employeeId,
-          name: t.name,
-          email: t.email,
-          password: hashedPassword,
-          role: 'TEACHER',
-          isActive: true
-        })
+        if (!user) {
+          password = generatePassword()
+          const hashedPassword = await bcrypt.hash(password, 10)
+          user = await User.create({
+            username: t.employeeId,
+            name: t.name,
+            email: t.email,
+            password: hashedPassword,
+            role: 'TEACHER',
+            isActive: true
+          })
+          credentials.push(`TEACHER ${t.name}: username=${t.employeeId}, password=${password}`)
+        }
 
         const teacher = await Teacher.create({
           userId: user._id,
@@ -91,7 +96,6 @@ const migrate = async () => {
 
         user.referenceId = teacher._id
         await user.save()
-        credentials.push(`TEACHER ${t.name}: loginId=${t.employeeId}, password=${password}`)
       }
     }
     console.log(`Migrated ${teachersData.length} Teachers.`)
@@ -101,17 +105,22 @@ const migrate = async () => {
     for (const s of studentsData) {
       const existing = await Student.findOne({ admissionNo: s.admissionNo })
       if (!existing) {
-        const password = generatePassword()
-        const hashedPassword = await bcrypt.hash(password, 10)
+        let user = await User.findOne({ username: s.admissionNo })
+        let password = 'PasswordExists'
         
-        const user = await User.create({
-          loginId: s.admissionNo,
-          name: s.name,
-          email: s.email,
-          password: hashedPassword,
-          role: 'STUDENT',
-          isActive: true
-        })
+        if (!user) {
+          password = generatePassword()
+          const hashedPassword = await bcrypt.hash(password, 10)
+          user = await User.create({
+            username: s.admissionNo,
+            name: s.name,
+            email: s.email,
+            password: hashedPassword,
+            role: 'STUDENT',
+            isActive: true
+          })
+          credentials.push(`STUDENT ${s.name}: username=${s.admissionNo}, password=${password}`)
+        }
 
         const student = await Student.create({
           userId: user._id,
@@ -119,13 +128,12 @@ const migrate = async () => {
           name: s.name,
           email: s.email,
           phone: s.phone,
-          grade: s.grade,
-          section: s.section
+          class: s.grade,
+          division: s.section
         })
 
         user.referenceId = student._id
         await user.save()
-        credentials.push(`STUDENT ${s.name}: loginId=${s.admissionNo}, password=${password}`)
       }
     }
     console.log(`Migrated ${studentsData.length} Students.`)
@@ -138,17 +146,22 @@ const migrate = async () => {
       if (student) {
         const existing = await Parent.findOne({ email: p.email })
         if (!existing) {
-          const password = generatePassword()
-          const hashedPassword = await bcrypt.hash(password, 10)
+          let user = await User.findOne({ username: p.email })
+          let password = 'PasswordExists'
           
-          const user = await User.create({
-            loginId: p.email, // using email as loginId for parent
-            name: p.name,
-            email: p.email,
-            password: hashedPassword,
-            role: 'PARENT',
-            isActive: true
-          })
+          if (!user) {
+            password = generatePassword()
+            const hashedPassword = await bcrypt.hash(password, 10)
+            user = await User.create({
+              username: p.email,
+              name: p.name,
+              email: p.email,
+              password: hashedPassword,
+              role: 'PARENT',
+              isActive: true
+            })
+            credentials.push(`PARENT ${p.name}: username=${p.email}, password=${password}`)
+          }
 
           const parent = await Parent.create({
             userId: user._id,
@@ -163,8 +176,6 @@ const migrate = async () => {
 
           student.parentId = parent._id
           await student.save()
-          
-          credentials.push(`PARENT ${p.name}: loginId=${p.email}, password=${password}`)
         }
       }
     }

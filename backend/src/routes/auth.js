@@ -1,6 +1,8 @@
 import express from 'express'
 import jwt from 'jsonwebtoken'
 import User from '../models/User.js'
+import { protect } from '../middleware/auth.js'
+
 
 const router = express.Router()
 
@@ -116,5 +118,33 @@ router.post('/logout', async (req, res) => {
     res.json({ success: true, message: 'Logged out' })
   }
 })
+
+// POST /api/auth/change-password
+router.post('/change-password', protect, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ success: false, message: 'All fields are required' })
+    }
+
+    const user = await User.findById(req.user.id).select('+password')
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' })
+    }
+
+    const isMatch = await user.comparePassword(currentPassword)
+    if (!isMatch) {
+      return res.status(400).json({ success: false, message: 'Incorrect current password' })
+    }
+
+    user.password = newPassword
+    await user.save()
+
+    res.json({ success: true, message: 'Password changed successfully' })
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error', error: error.message })
+  }
+})
+
 
 export default router

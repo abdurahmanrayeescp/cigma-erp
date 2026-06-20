@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X, Moon, Sun, ChevronDown, LogIn } from 'lucide-react'
 import { useTheme } from '@/context/ThemeContext'
+import { useAuth } from '@/context/AuthContext'
 import { cn } from '@/lib/utils'
 
 const navLinks = [
@@ -36,6 +37,7 @@ export default function Navbar() {
   const [isMobileOpen, setIsMobileOpen] = useState(false)
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
   const { theme, toggleTheme, isDark } = useTheme()
+  const { user, isAuthenticated, logout } = useAuth()
   const location = useLocation()
   const dropdownRef = useRef<HTMLDivElement>(null)
 
@@ -211,14 +213,38 @@ export default function Navbar() {
             </button>
 
 
-            {/* Login Button — Desktop */}
-            <Link
-              to="/login"
-              className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg bg-maroon-600 hover:bg-maroon-700 text-white text-sm font-semibold shadow-md hover:shadow-maroon-600/40 hover:scale-105 transition-all duration-300"
-            >
-              <LogIn className="w-3.5 h-3.5" />
-              Login
-            </Link>
+            {/* Login / Portal Button — Desktop */}
+            {isAuthenticated ? (
+              <div className="hidden sm:flex items-center gap-3">
+                <Link
+                  to={`/portal/${user?.role === 'SUPER_ADMIN' || user?.role === 'ADMIN' ? 'admin' : user?.role?.toLowerCase()}`}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-maroon-600 hover:bg-maroon-700 text-white text-sm font-semibold shadow-md hover:shadow-maroon-600/40 hover:scale-105 transition-all duration-300"
+                >
+                  Portal
+                </Link>
+                <button
+                  onClick={logout}
+                  className={cn(
+                    'px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-300 border border-transparent hover:border-maroon-600',
+                    solidBg
+                      ? isDark
+                        ? 'text-navy-200 hover:bg-white/5'
+                        : 'text-navy-700 hover:bg-warm-100'
+                      : 'text-white/90 hover:bg-white/10'
+                  )}
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <Link
+                to="/login"
+                className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg bg-maroon-600 hover:bg-maroon-700 text-white text-sm font-semibold shadow-md hover:shadow-maroon-600/40 hover:scale-105 transition-all duration-300"
+              >
+                <LogIn className="w-3.5 h-3.5" />
+                Login
+              </Link>
+            )}
 
             <button
               onClick={() => setIsMobileOpen(!isMobileOpen)}
@@ -302,14 +328,36 @@ export default function Navbar() {
                     )}
                   </div>
                 ))}
-                {/* Login Button — Mobile */}
+                {/* Login / Portal Button — Mobile */}
                 <div className="pt-2 px-4">
-                  <Link
-                    to="/login"
-                    className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-maroon-600 hover:bg-maroon-700 text-white text-sm font-semibold transition-colors"
-                  >
-                    <LogIn className="w-4 h-4" /> Login
-                  </Link>
+                  {isAuthenticated ? (
+                    <div className="space-y-2">
+                      <Link
+                        to={`/portal/${user?.role === 'SUPER_ADMIN' || user?.role === 'ADMIN' ? 'admin' : user?.role?.toLowerCase()}`}
+                        className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-maroon-600 hover:bg-maroon-700 text-white text-sm font-semibold transition-colors"
+                      >
+                        Portal
+                      </Link>
+                      <button
+                        onClick={logout}
+                        className={cn(
+                          'w-full py-3 rounded-xl text-sm font-semibold transition-colors border',
+                          isDark
+                            ? 'border-maroon-700/30 text-navy-200 bg-white/5 hover:bg-white/10'
+                            : 'border-warm-200 text-navy-600 bg-warm-50 hover:bg-warm-100'
+                        )}
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  ) : (
+                    <Link
+                      to="/login"
+                      className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-maroon-600 hover:bg-maroon-700 text-white text-sm font-semibold transition-colors"
+                    >
+                      <LogIn className="w-4 h-4" /> Login
+                    </Link>
+                  )}
                 </div>
               </div>
             </motion.div>

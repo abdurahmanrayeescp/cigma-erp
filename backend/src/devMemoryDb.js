@@ -3,8 +3,13 @@ let mongoMemServer = null
 export default async () => {
   const configured = process.env.MONGODB_URI || ''
 
-  // Only intercept local/missing URIs
-  if (configured.includes('127.0.0.1') || configured.includes('localhost') || !configured) {
+  // Only intercept local/missing URIs, or invalid ones (that cause MongoParseError)
+  if (
+    configured.includes('127.0.0.1') || 
+    configured.includes('localhost') || 
+    !configured ||
+    (!configured.startsWith('mongodb://') && !configured.startsWith('mongodb+srv://'))
+  ) {
     if (!mongoMemServer) {
       console.log('🗄️  Starting in-memory MongoDB...')
       const { MongoMemoryServer } = await import('mongodb-memory-server')

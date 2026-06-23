@@ -4,6 +4,15 @@ All notable changes to the CIGMA ERP project will be documented in this file. Th
 
 ---
 
+## [1.0.1] - 2026-06-20
+
+### Fixed
+- **Render Production Deployment Connection**: Prevented `mongodb-memory-server` from loading or being resolved on Render by using ESM dynamic `import()` for `devMemoryDb.js` and dynamically loading `mongodb-memory-server` only in development mode.
+- **Production Server Startup Logs**: Added environment logging and connection status notifications to streamline Render deployment diagnostics.
+- **Prevented Production Auto-Seeding**: Bypassed database auto-seeding logic in production to protect MongoDB Atlas integrity.
+
+---
+
 ## [1.0.0] - 2026-06-20
 
 CIGMA ERP Version 1.0.0 is officially released. This version is stabilized, frozen, and optimized for post-launch monitoring, logging, diagnostics, and maintenance support.

@@ -5,7 +5,6 @@ import helmet from 'helmet'
 import rateLimit from 'express-rate-limit'
 import mongoSanitize from 'express-mongo-sanitize'
 import dotenv from 'dotenv'
-import { getMongoUri } from './devMemoryDb.js'
 import { autoSeedDatabase } from './autoSeed.js'
 import { logger } from './utils/logger.js'
 
@@ -169,14 +168,26 @@ app.use((_req, res) => {
 // ─── Database Connection ────────────────────────────────────────────────
 async function startServer() {
   try {
-    const mongoUri = await getMongoUri()
+    console.log("Environment:", process.env.NODE_ENV || "development");
+
+    if (process.env.NODE_ENV !== "production") {
+      const { default: startDevMemoryDb } = await import("./devMemoryDb.js");
+      await startDevMemoryDb();
+    } else {
+      console.log("Connecting to MongoDB Atlas...");
+    }
+
+    const mongoUri = process.env.MONGODB_URI
     if (!mongoUri) throw new Error('MONGODB_URI is not defined in environment variables')
 
-    await mongoose.connect(mongoUri)
+    await mongoose.connect(process.env.MONGODB_URI)
+    console.log("MongoDB connected")
     console.log('✅ Connected to MongoDB')
 
     // Auto-seed database if empty (useful for dev/in-memory DBs)
-    await autoSeedDatabase()
+    if (process.env.NODE_ENV !== "production") {
+      await autoSeedDatabase()
+    }
 
     app.listen(PORT, () => {
       console.log(`🚀 CIGMA API Server running on port ${PORT}`)

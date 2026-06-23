@@ -54,13 +54,23 @@ If you have pushed the project's root `render.yaml` to your GitHub repo:
 
 
 ## 3. Frontend (Vercel)
+
+### Option A: One-Click Deploy to Vercel
+You can deploy the frontend to Vercel with a single click:
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/abdurahmanrayeescp/cigma-erp&root-directory=frontend)
+
+### Option B: Manual Deploy on Vercel
 1. Log in to [Vercel](https://vercel.com/).
 2. Click **Add New Project** -> Import from GitHub.
-3. Set the Root Directory to `frontend`.
-4. Framework Preset: `Vite`.
-5. Under Environment Variables, add:
-   - `VITE_API_URL` (Point to your Railway backend URL, e.g. `https://cigma-backend.up.railway.app/api`)
-6. Deploy.
+3. Choose the repository `cigma-erp`.
+4. Set the **Root Directory** to `frontend`.
+5. Framework Preset: `Vite` (automatically detected).
+6. Under Environment Variables, add:
+   - `VITE_API_URL` (Point to your Render backend API URL, e.g. `https://cigma-backend.onrender.com/api` or Railway URL `https://cigma-backend.up.railway.app/api`)
+   - `VITE_CLOUD_NAME` (Your Cloudinary cloud name)
+7. Click **Deploy**.
+
 
 ## 4. Initialization
 1. SSH into the Railway backend container, or run locally pointing to the Atlas DB:

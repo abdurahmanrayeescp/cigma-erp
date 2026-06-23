@@ -170,12 +170,8 @@ async function startServer() {
   try {
     console.log("Environment:", process.env.NODE_ENV || "development");
 
-    if (process.env.NODE_ENV !== "production") {
-      const { default: startDevMemoryDb } = await import("./devMemoryDb.js");
-      await startDevMemoryDb();
-    } else {
-      console.log("Connecting to MongoDB Atlas...");
-    }
+    const { default: startDevMemoryDb } = await import("./devMemoryDb.js");
+    await startDevMemoryDb();
 
     const mongoUri = process.env.MONGODB_URI
     if (!mongoUri) throw new Error('MONGODB_URI is not defined in environment variables')
@@ -185,7 +181,7 @@ async function startServer() {
     console.log('✅ Connected to MongoDB')
 
     // Auto-seed database if empty (useful for dev/in-memory DBs)
-    if (process.env.NODE_ENV !== "production") {
+    if (process.env.NODE_ENV !== "production" || process.env.IS_MEMORY_DB === 'true') {
       await autoSeedDatabase()
     }
 

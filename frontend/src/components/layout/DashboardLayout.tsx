@@ -5,12 +5,14 @@ import {
   Menu, X, Bell, User, LogOut, Moon, Sun, 
   LayoutDashboard, Users, GraduationCap, BookOpen, 
   CalendarDays, CheckSquare, FileText, IndianRupee,
-  Settings, Layers, Home, Award, Bus, Banknote, ShieldAlert
+  Settings, Layers, Home, Award, Bus, Banknote, ShieldAlert,
+  Sparkles
 } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { useTheme } from '@/context/ThemeContext'
 import { cn } from '@/lib/utils'
 import NotificationsWidget from '@/components/portal/NotificationsWidget'
+import CigmaVoiceAssistant from '@/components/ai/CigmaVoiceAssistant'
 
 // Types for navigation
 interface NavItem {
@@ -45,6 +47,7 @@ const TEACHER_NAV: NavItem[] = [
   { label: 'Homework', href: '/portal/teacher/homework', icon: BookOpen },
   { label: 'Timetable', href: '/portal/teacher/timetable', icon: CalendarDays },
   { label: 'Payslips', href: '/portal/teacher/payslips', icon: Banknote },
+  { label: 'AI Study Plan', href: '/portal/teacher/study-plan', icon: Sparkles },
 ]
 
 const STUDENT_NAV: NavItem[] = [
@@ -54,6 +57,7 @@ const STUDENT_NAV: NavItem[] = [
   { label: 'Homework', href: '/portal/student/homework', icon: BookOpen },
   { label: 'Timetable', href: '/portal/student/timetable', icon: CalendarDays },
   { label: 'Library', href: '/portal/student/library', icon: BookOpen },
+  { label: 'AI Study Plan', href: '/portal/student/study-plan', icon: Sparkles },
 ]
 
 const PARENT_NAV: NavItem[] = [
@@ -63,6 +67,7 @@ const PARENT_NAV: NavItem[] = [
   { label: 'Homework', href: '/portal/parent/homework', icon: BookOpen },
   { label: 'Fees', href: '/portal/parent/fees', icon: IndianRupee },
   { label: 'Timetable', href: '/portal/parent/timetable', icon: CalendarDays },
+  { label: 'AI Study Plan', href: '/portal/parent/study-plan', icon: Sparkles },
 ]
 
 export default function DashboardLayout() {
@@ -196,6 +201,7 @@ export default function DashboardLayout() {
             </motion.div>
           </AnimatePresence>
         </main>
+        <CigmaVoiceAssistant />
       </div>
     </div>
   )

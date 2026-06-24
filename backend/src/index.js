@@ -33,6 +33,9 @@ import teacherRoutes from './routes/teachers.js'
 import academicsRoutes from './routes/academics.js'
 import systemRoutes from './routes/system.js'
 import parentRoutes from './routes/parents.js'
+import aiStudyPlanRoutes from './routes/aiStudyPlan.js'
+import aiParentInsightsRoutes from './routes/aiParentInsights.js'
+import aiRoutes from './routes/aiStudyPlan.js'
 
 dotenv.config()
 
@@ -135,6 +138,9 @@ app.use('/api/teachers', teacherRoutes)
 app.use('/api/academics', academicsRoutes)
 app.use('/api/system', systemRoutes)
 app.use('/api/parents', parentRoutes)
+app.use('/api/ai', aiStudyPlanRoutes)
+app.use('/api/ai/parent-insights', aiParentInsightsRoutes)
+app.use('/api/ai', aiRoutes)
 
 // Health check
 app.get('/api/health', (_req, res) => {

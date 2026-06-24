@@ -32,6 +32,9 @@ import AdminDashboard from '@/pages/portal/AdminDashboard'
 import TeacherDashboard from '@/pages/portal/TeacherDashboard'
 import ParentDashboard from '@/pages/portal/ParentDashboard'
 import StudentDashboard from '@/pages/portal/StudentDashboard'
+import StudentStudyPlanPage from '@/pages/portal/StudentStudyPlanPage'
+import ParentInsightsPage from '@/pages/portal/ParentInsightsPage'
+import AiAnalyticsDashboard from '@/pages/portal/AiAnalyticsDashboard'
 
 // Attendance Pages
 import TeacherAttendancePage from '@/pages/portal/TeacherAttendancePage'
@@ -155,6 +158,8 @@ function AppRoutes() {
               <Route path="payroll" element={<AdminPayrollPage />} />
               <Route path="audit" element={<AdminAuditLogsPage />} />
               <Route path="settings" element={<AdminSettingsPage />} />
+              <Route path="ai-analytics" element={<AiAnalyticsDashboard />} />
+              <Route path="insights/:studentId" element={<ParentInsightsPage />} />
             </Route>
             <Route path="teacher" element={<ProtectedRoute allowedRoles={['TEACHER']} />}>
               <Route index element={<TeacherDashboard />} />
@@ -164,7 +169,8 @@ function AppRoutes() {
               <Route path="homework" element={<TeacherHomeworkPage />} />
               <Route path="timetable" element={<TeacherTimetablePage />} />
               <Route path="payslips" element={<TeacherPayslipPage />} />
-              {/* Other teacher routes will go here */}
+              <Route path="study-plan" element={<StudentStudyPlanPage />} />
+              <Route path="insights/:studentId" element={<ParentInsightsPage />} />
             </Route>
             <Route path="parent" element={<ProtectedRoute allowedRoles={['PARENT']} />}>
               <Route index element={<ParentDashboard />} />
@@ -173,7 +179,8 @@ function AppRoutes() {
               <Route path="homework" element={<ParentHomeworkPage />} />
               <Route path="timetable" element={<ParentTimetablePage />} />
               <Route path="fees" element={<ParentFeesPage />} />
-              {/* Other parent routes will go here */}
+              <Route path="study-plan" element={<StudentStudyPlanPage />} />
+              <Route path="insights/:studentId" element={<ParentInsightsPage />} />
             </Route>
             <Route path="student" element={<ProtectedRoute allowedRoles={['STUDENT']} />}>
               <Route index element={<StudentDashboard />} />
@@ -182,7 +189,8 @@ function AppRoutes() {
               <Route path="homework" element={<StudentHomeworkPage />} />
               <Route path="timetable" element={<StudentTimetablePage />} />
               <Route path="library" element={<StudentLibraryPage />} />
-              {/* Other student routes will go here */}
+              <Route path="study-plan" element={<StudentStudyPlanPage />} />
+              <Route path="insights/:studentId" element={<ParentInsightsPage />} />
             </Route>
           </Route>
         </Route>

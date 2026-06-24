@@ -266,3 +266,18 @@ const auditSchema = new mongoose.Schema({
 }, { timestamps: true })
 
 export const Audit = mongoose.model('Audit', auditSchema)
+
+// ─── AI Analytics ──────────────────────────────────────────────────────
+const aiAnalyticsSchema = new mongoose.Schema({
+  action: {
+    type: String,
+    required: true,
+    enum: ['REPORT_GENERATED', 'PDF_DOWNLOADED', 'WEEKLY_SUMMARY_GENERATED', 'INSIGHT_WIDGET_VIEWED', 'INSIGHTS_VIEWED']
+  },
+  studentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Student' },
+  userRole: { type: String, required: true },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  timestamp: { type: Date, default: Date.now }
+}, { timestamps: true })
+
+export const AiAnalytics = mongoose.model('AiAnalytics', aiAnalyticsSchema)

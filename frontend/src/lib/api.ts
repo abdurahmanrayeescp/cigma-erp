@@ -215,7 +215,7 @@ export const marksApi = {
     return get<{ success: boolean; data: any[] }>(`/marks/student/${studentId}${q ? `?${q}` : ''}`)
   },
   uploadMarks: (classId: string, subject: string, exam: string, academicYear: string, records: any[]) =>
-    post<{ success: boolean }>('/marks', { classId, subject, exam, academicYear, records }),
+    post<{ success: boolean; message?: string }>('/marks', { classId, subject, exam, academicYear, records }),
   editMark: (id: string, marksObtained: number, maxMarks: number) =>
     put<{ success: boolean; data: any }>(`/marks/${id}`, { marksObtained, maxMarks }),
 }
@@ -229,9 +229,9 @@ export const homeworkApi = {
     return get<{ success: boolean; data: any[] }>(`/homework/class/${classId}${q ? `?${q}` : ''}`)
   },
   assignHomework: (payload: { title: string; description: string; classId: string; subject: string; dueDate: string; pdfUrl?: string }) =>
-    post<{ success: boolean; data: any }>('/homework', payload),
+    post<{ success: boolean; data: any; message?: string }>('/homework', payload),
   deleteHomework: (id: string) =>
-    request(`/homework/${id}`, { method: 'DELETE' }),
+    request<{ success: boolean; message?: string }>(`/homework/${id}`, { method: 'DELETE' }),
 }
 
 // ─── Timetable ────────────────────────────────────────────────────────────
@@ -283,4 +283,13 @@ export const teachersApi = {
 export const academicsApi = {
   getClasses: () => get<{ success: boolean; data: any[] }>('/academics/classes'),
   getSubjects: () => get<{ success: boolean; data: any[] }>('/academics/subjects'),
+}
+
+export const aiApi = {
+  getStudyPlan: (studentId: string) => get<{ success: boolean; data: any; message?: string }>(`/ai/study-plan/${studentId}`),
+  getAssistantCommands: () => get<{ success: boolean; availableCommands: string[]; message?: string }>('/ai/assistant'),
+  getParentInsights: (studentId: string) => get<{ success: boolean; data: any; message?: string }>(`/ai/parent-insights/${studentId}`),
+  getWeeklySummary: (studentId: string) => get<{ success: boolean; data: any; message?: string }>(`/ai/parent-insights/${studentId}/weekly-summary`),
+  getParentInsightsWidget: (studentId: string) => get<{ success: boolean; data: any; message?: string }>(`/ai/parent-insights/${studentId}/widget`),
+  getAiAnalytics: () => get<{ success: boolean; data: any; message?: string }>('/ai/parent-insights/analytics'),
 }

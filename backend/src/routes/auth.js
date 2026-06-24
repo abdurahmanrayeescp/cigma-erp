@@ -1,6 +1,7 @@
 import express from 'express'
 import jwt from 'jsonwebtoken'
 import User from '../models/User.js'
+import { Student, Teacher, Parent, Class } from '../models/index.js'
 import { protect } from '../middleware/auth.js'
 
 
@@ -141,6 +142,69 @@ router.post('/change-password', protect, async (req, res) => {
     await user.save()
 
     res.json({ success: true, message: 'Password changed successfully' })
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error', error: error.message })
+  }
+})
+// GET /api/auth/me — returns current user + referenceId (linked profile _id)
+router.get('/me', protect, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('-password -refreshToken')
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' })
+
+    let referenceId = null
+    let referenceData = null
+
+    if (user.role === 'STUDENT') {
+      const profile = await Student.findOne({ userId: user._id }).select('_id admissionNo class division studentId')
+      if (profile) {
+        const classDoc = await Class.findOne({ className: profile.class, division: profile.division })
+        referenceData = {
+          ...profile.toObject(),
+          classId: classDoc ? classDoc._id : null
+        }
+        referenceId = profile._id
+      }
+    } else if (user.role === 'PARENT') {
+      const profile = await Parent.findOne({ userId: user._id })
+        .select('_id fatherName motherName phone')
+        .populate('children', '_id name admissionNo class division')
+      if (profile) {
+        const enrichedChildren = []
+        for (const child of profile.children) {
+          const classDoc = await Class.findOne({ className: child.class, division: child.division })
+          enrichedChildren.push({
+            ...child.toObject(),
+            classId: classDoc ? classDoc._id : null
+          })
+        }
+        referenceData = {
+          _id: profile._id,
+          fatherName: profile.fatherName,
+          motherName: profile.motherName,
+          phone: profile.phone,
+          children: enrichedChildren
+        }
+        referenceId = profile._id
+      }
+    } else if (user.role === 'TEACHER') {
+      const profile = await Teacher.findOne({ userId: user._id }).select('_id employeeId name department')
+      referenceId = profile?._id ?? null
+      referenceData = profile
+    }
+
+    res.json({
+      success: true,
+      data: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        avatar: user.avatar,
+        referenceId,
+        referenceData,
+      }
+    })
   } catch (error) {
     res.status(500).json({ success: false, message: 'Server error', error: error.message })
   }

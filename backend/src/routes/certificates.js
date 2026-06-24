@@ -6,7 +6,12 @@ import { generateTransferCertificate, generateBonafideCertificate } from '../con
 const router = express.Router()
 
 // Admin routes to generate certificates
-router.post('/tc', protect, requireRole('SUPER_ADMIN', 'ADMIN', 'PRINCIPAL', 'OFFICE_STAFF'), generateTransferCertificate)
-router.post('/bonafide', protect, requireRole('SUPER_ADMIN', 'ADMIN', 'PRINCIPAL', 'OFFICE_STAFF'), generateBonafideCertificate)
+router.route('/tc')
+  .post(protect, requireRole('SUPER_ADMIN', 'ADMIN', 'PRINCIPAL', 'OFFICE_STAFF'), generateTransferCertificate)
+  .get(protect, requireRole('SUPER_ADMIN', 'ADMIN', 'PRINCIPAL', 'OFFICE_STAFF'), generateTransferCertificate)
+
+router.route('/bonafide')
+  .post(protect, requireRole('SUPER_ADMIN', 'ADMIN', 'PRINCIPAL', 'OFFICE_STAFF'), generateBonafideCertificate)
+  .get(protect, requireRole('SUPER_ADMIN', 'ADMIN', 'PRINCIPAL', 'OFFICE_STAFF'), generateBonafideCertificate)
 
 export default router

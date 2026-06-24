@@ -6,8 +6,9 @@ interface AuthUser {
   name: string
   email: string
   role: string
-  referenceId?: string
   avatar?: string
+  referenceId?: string      // Linked Student / Teacher / Parent document _id
+  referenceData?: any       // Full linked profile (children array for parents, etc.)
 }
 
 interface AuthContextValue {
@@ -21,63 +22,79 @@ interface AuthContextValue {
   isStaff: boolean
 }
 
-const ADMIN_ROLES  = ['SUPER_ADMIN', 'ADMIN']
-const STAFF_ROLES  = ['SUPER_ADMIN', 'ADMIN', 'PRINCIPAL', 'OFFICE_STAFF', 'TEACHER']
+const ADMIN_ROLES = ['SUPER_ADMIN', 'ADMIN']
+const STAFF_ROLES = ['SUPER_ADMIN', 'ADMIN', 'PRINCIPAL', 'OFFICE_STAFF', 'TEACHER']
 
 const AuthContext = createContext<AuthContextValue | null>(null)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser]               = useState<AuthUser | null>(null)
-  const [accessToken, setToken]       = useState<string | null>(null)
-  const [isLoading, setIsLoading]     = useState(true)   // starts true — checks session on mount
+  const [user, setUser]           = useState<AuthUser | null>(null)
+  const [accessToken, setToken]   = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
-  // keep module-level token in sync
   const storeToken = useCallback((t: string | null) => {
     setToken(t)
     setAccessToken(t)
   }, [])
 
-  // ── Try to restore session via refresh token cookie on page load ──────
+  // Fetches /me and merges referenceId / referenceData into an existing base user
+  const fetchAndMergeProfile = useCallback(async (base: Partial<AuthUser>): Promise<AuthUser> => {
+    try {
+      const me = await authApi.me()
+      const d = me.data as any
+      return {
+        id:            d.id            ?? base.id ?? '',
+        name:          d.name          ?? base.name ?? '',
+        email:         d.email         ?? base.email ?? '',
+        role:          d.role          ?? base.role ?? '',
+        avatar:        d.avatar        ?? base.avatar,
+        referenceId:   d.referenceId   ?? undefined,
+        referenceData: d.referenceData ?? undefined,
+      }
+    } catch {
+      return base as AuthUser
+    }
+  }, [])
+
+  // Restore session from refresh-token cookie on mount
   useEffect(() => {
     async function restoreSession() {
       try {
         const data = await authApi.refresh()
         storeToken(data.accessToken)
+        // Decode JWT for a quick base object, then enrich with /me
+        let base: Partial<AuthUser> = {}
         try {
-          const me = await authApi.me()
-          setUser(me.data as AuthUser)
-        } catch {
-          // Decode JWT payload as fallback
           const payload = JSON.parse(atob(data.accessToken.split('.')[1]))
-          setUser({ id: payload.userId, name: '', email: '', role: payload.role })
-        }
+          base = { id: payload.userId, role: payload.role, name: '', email: '' }
+        } catch { /* ignore */ }
+        const enriched = await fetchAndMergeProfile(base)
+        setUser(enriched)
       } catch {
-        // No valid session — user stays null
+        // No valid session
       } finally {
         setIsLoading(false)
       }
     }
     restoreSession()
-  }, [storeToken])
+  }, [storeToken, fetchAndMergeProfile])
 
-  // ── Login ─────────────────────────────────────────────────────────────
   const login = useCallback(async (loginId: string, password: string) => {
     try {
       const data = await authApi.login(loginId, password)
       storeToken(data.accessToken)
-      setUser(data.user as unknown as AuthUser)
-      return { success: true }
+      const base = data.user as unknown as Partial<AuthUser>
+      const enriched = await fetchAndMergeProfile(base)
+      setUser(enriched)
+      return { success: true, role: enriched.role }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Login failed'
       return { success: false, message }
     }
-  }, [storeToken])
+  }, [storeToken, fetchAndMergeProfile])
 
-  // ── Logout ────────────────────────────────────────────────────────────
   const logout = useCallback(async () => {
-    try {
-      await authApi.logout()
-    } catch { /* ignore network errors */ }
+    try { await authApi.logout() } catch { /* ignore */ }
     setUser(null)
     storeToken(null)
   }, [storeToken])
@@ -89,8 +106,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     login,
     logout,
     isAuthenticated: !!user,
-    isAdmin:  user ? ADMIN_ROLES.includes(user.role)  : false,
-    isStaff:  user ? STAFF_ROLES.includes(user.role)  : false,
+    isAdmin: user ? ADMIN_ROLES.includes(user.role) : false,
+    isStaff: user ? STAFF_ROLES.includes(user.role) : false,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

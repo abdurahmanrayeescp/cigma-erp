@@ -37,7 +37,18 @@ export default function Login() {
 
     if (result.success) {
       toast.success('Logged in successfully!')
-      navigate('/')        // redirect to home (swap with '/dashboard' when ready)
+      const role = (result as any).role
+      if (role === 'SUPER_ADMIN' || role === 'ADMIN') {
+        navigate('/portal/admin')
+      } else if (role === 'TEACHER') {
+        navigate('/portal/teacher')
+      } else if (role === 'PARENT') {
+        navigate('/portal/parent')
+      } else if (role === 'STUDENT') {
+        navigate('/portal/student')
+      } else {
+        navigate('/')
+      }
     } else {
       toast.error(result.message || 'Login failed. Please try again.')
     }

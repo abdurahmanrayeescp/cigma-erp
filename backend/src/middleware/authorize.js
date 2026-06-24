@@ -5,7 +5,8 @@
  * Usage:
  *   router.post('/', protect, requireRole('ADMIN', 'PRINCIPAL'), handler)
  */
-export function requireRole(...allowedRoles) {
+export function requireRole(...rolesInput) {
+  const allowedRoles = rolesInput.flat()
   return (req, res, next) => {
     if (!req.user) {
       return res.status(401).json({ success: false, message: 'Not authenticated.' })

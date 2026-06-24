@@ -25,10 +25,11 @@ export default function AdminCertificatesPage() {
         ? { studentId: searchTerm, reason, dateOfLeaving }
         : { studentId: searchTerm, purpose }
 
-      const endpoint = certificateType === 'tc' ? '/api/certificates/tc' : '/api/certificates/bonafide'
+      const endpoint = certificateType === 'tc' ? '/certificates/tc' : '/certificates/bonafide'
+      const apiBase = import.meta.env.VITE_API_URL ?? '/api'
       
       // We mock the download since it returns a PDF blob, using window.open for simplicity
-      window.open(`http://localhost:5000${endpoint}?studentId=${searchTerm}&reason=${reason}`, '_blank')
+      window.open(`${apiBase}${endpoint}?studentId=${searchTerm}&reason=${reason}&dateOfLeaving=${dateOfLeaving}&purpose=${purpose}`, '_blank')
       
       toast.success(`${certificateType.toUpperCase()} Certificate Generated successfully`)
     } catch (err) {

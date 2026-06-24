@@ -4,8 +4,11 @@ import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'
 // Generate Transfer Certificate
 export const generateTransferCertificate = async (req, res) => {
   try {
-    const { studentId, reason, dateOfLeaving } = req.body
+    const studentId = req.body?.studentId || req.query?.studentId
+    const reason = req.body?.reason || req.query?.reason
+    const dateOfLeaving = req.body?.dateOfLeaving || req.query?.dateOfLeaving
     
+    if (!studentId) return res.status(400).json({ success: false, message: 'Student ID is required' })
     const student = await Student.findById(studentId).populate('class')
     if (!student) return res.status(404).json({ success: false, message: 'Student not found' })
 
@@ -44,8 +47,10 @@ export const generateTransferCertificate = async (req, res) => {
 // Generate Bonafide Certificate
 export const generateBonafideCertificate = async (req, res) => {
   try {
-    const { studentId, purpose } = req.body
+    const studentId = req.body?.studentId || req.query?.studentId
+    const purpose = req.body?.purpose || req.query?.purpose
     
+    if (!studentId) return res.status(400).json({ success: false, message: 'Student ID is required' })
     const student = await Student.findById(studentId).populate('class')
     if (!student) return res.status(404).json({ success: false, message: 'Student not found' })
 

@@ -53,7 +53,7 @@ export const authApi = {
 
   refresh: () => request<{ accessToken: string }>('/auth/refresh', { method: 'POST' }),
 
-  me: () => get<{ success: boolean; data: { id: string; name: string; email: string; role: string } }>('/auth/me'),
+  me: () => get<{ success: boolean; data: { id: string; name: string; email: string; role: string; avatar?: string; referenceId?: string; referenceData?: any } }>('/auth/me'),
   changePassword: (currentPassword: string, newPassword: string) =>
     post<{ success: boolean; message: string }>('/auth/change-password', { currentPassword, newPassword }),
 }
@@ -250,7 +250,13 @@ export const timetableApi = {
 export const feesApi = {
   getAllFees: () => get<{ success: boolean; data: any[] }>('/fees/all'),
   getStudentFees: (studentId: string) => get<{ success: boolean; data: any[] }>(`/fees/student/${studentId}`),
-  // Note: For generating receipt, point window.open to `/api/fees/receipt/${feeId}/${paymentId}`
+  getMyFees: () => get<{ success: boolean; data: any[] }>('/fees/my'),
+  // For generating a receipt open: window.open(`${BASE}/fees/receipt/${feeId}/${paymentId}`)
+}
+
+// ─── Parents ──────────────────────────────────────────────────────────────────
+export const parentsApi = {
+  getMyProfile: () => get<{ success: boolean; data: any }>('/parents/me'),
 }
 
 // ─── Notifications ────────────────────────────────────────────────────────

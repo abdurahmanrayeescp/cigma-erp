@@ -5,7 +5,8 @@ import toast from 'react-hot-toast'
 export default function AdminReportsPage() {
   const handleDownload = (type: string) => {
     // We simulate the download by opening the export endpoint directly
-    window.open(`http://localhost:5000/api/reports/${type}`, '_blank')
+    const apiBase = import.meta.env.VITE_API_URL ?? '/api'
+    window.open(`${apiBase}/reports/${type}`, '_blank')
     toast.success(`Exporting ${type} report...`)
   }
 

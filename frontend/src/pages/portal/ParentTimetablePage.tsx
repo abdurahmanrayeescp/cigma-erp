@@ -1,23 +1,79 @@
-import { useState } from 'react'
-import { CalendarDays } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { CalendarDays, AlertCircle } from 'lucide-react'
+import { useAuth } from '@/context/AuthContext'
+import { timetableApi } from '@/lib/api'
 import TimetableGrid from '@/components/portal/TimetableGrid'
 
-const mockChildren = [
-  { id: 'S10001', name: 'Aarav Patel', class: 'Class 1 - A' },
-  { id: 'S10002', name: 'Rohan Patel', class: 'Class 3 - B' },
-]
+interface BackendTimetableEntry {
+  _id: string
+  day: string
+  period: number
+  subject: string
+  teacher?: {
+    name: string
+  }
+  startTime?: string
+  endTime?: string
+}
 
-const MOCK_CLASS_ENTRIES = [
-  { day: 'Monday', period: 1, subject: 'Mathematics', teacherName: 'Mr. John Doe', startTime: '09:00', endTime: '09:45' },
-  { day: 'Monday', period: 2, subject: 'Science', teacherName: 'Mrs. Smith', startTime: '09:45', endTime: '10:30' },
-  { day: 'Monday', period: 3, subject: 'English', teacherName: 'Ms. Davis', startTime: '10:45', endTime: '11:30' },
-  { day: 'Tuesday', period: 1, subject: 'Science', teacherName: 'Mrs. Smith', startTime: '09:00', endTime: '09:45' },
-  { day: 'Tuesday', period: 2, subject: 'Mathematics', teacherName: 'Mr. John Doe', startTime: '09:45', endTime: '10:30' },
-]
+interface Child {
+  _id: string
+  name: string
+  admissionNo: string
+  class: string
+  division: string
+  classId?: string | null
+}
 
 export default function ParentTimetablePage() {
-  const [selectedChild, setSelectedChild] = useState(mockChildren[0].id)
-  
+  const { user } = useAuth()
+  const childrenList: Child[] = user?.referenceData?.children || []
+
+  const [selectedChild, setSelectedChild] = useState<string>('')
+  const [entries, setEntries] = useState<any[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  // Initialize selected child
+  useEffect(() => {
+    if (childrenList.length > 0) {
+      setSelectedChild(childrenList[0]._id)
+    }
+  }, [user])
+
+  // Fetch timetable when selected child changes
+  useEffect(() => {
+    if (!selectedChild) return
+
+    const childObj = childrenList.find(c => c._id === selectedChild)
+    if (!childObj?.classId) {
+      setEntries([])
+      setError(`${childObj?.name || 'Selected child'} is not currently assigned to a class. Please contact the administrator.`)
+      return
+    }
+
+    setLoading(true)
+    setError(null)
+    timetableApi.getClassTimetable(childObj.classId)
+      .then(res => {
+        if (res.success && res.data) {
+          const mapped = res.data.map((item: BackendTimetableEntry) => ({
+            day: item.day,
+            period: item.period,
+            subject: item.subject,
+            teacherName: item.teacher?.name,
+            startTime: item.startTime,
+            endTime: item.endTime
+          }))
+          setEntries(mapped)
+        }
+      })
+      .catch(() => setError('Failed to load class timetable.'))
+      .finally(() => setLoading(false))
+  }, [selectedChild])
+
+  const childObj = childrenList.find(c => c._id === selectedChild)
+
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4">
@@ -29,23 +85,37 @@ export default function ParentTimetablePage() {
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">View your children's weekly class schedules.</p>
         </div>
 
-        {mockChildren.length > 1 && (
+        {childrenList.length > 1 && (
           <div className="min-w-[200px]">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Select Child</label>
+            <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Select Child</label>
             <select
               value={selectedChild}
               onChange={(e) => setSelectedChild(e.target.value)}
-              className="w-full rounded-lg border-gray-300 dark:border-white/10 dark:bg-navy-950 dark:text-white px-4 py-2 focus:ring-maroon-500 focus:border-maroon-500 shadow-sm"
+              className="w-full rounded-xl border border-gray-200 dark:border-white/10 dark:bg-navy-950 dark:text-white px-4 py-2 focus:ring-maroon-500 shadow-sm text-sm"
             >
-              {mockChildren.map(c => (
-                <option key={c.id} value={c.id}>{c.name} ({c.class})</option>
+              {childrenList.map(c => (
+                <option key={c._id} value={c._id}>{c.name} ({c.class} - {c.division})</option>
               ))}
             </select>
           </div>
         )}
       </div>
 
-      <TimetableGrid entries={MOCK_CLASS_ENTRIES} role="PARENT" />
+      {childrenList.length === 0 ? (
+        <div className="flex items-center gap-3 p-4 bg-yellow-50 dark:bg-yellow-500/10 border border-yellow-200 dark:border-yellow-500/20 rounded-2xl text-yellow-700 dark:text-yellow-400">
+          <AlertCircle className="w-5 h-5 shrink-0" />
+          <p className="text-sm font-medium">No children linked to this parent profile. Please contact the administrator.</p>
+        </div>
+      ) : loading ? (
+        <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-maroon-600" /></div>
+      ) : error ? (
+        <div className="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-2xl text-red-700 dark:text-red-400">
+          <AlertCircle className="w-5 h-5 shrink-0" />
+          <p className="text-sm font-medium">{error}</p>
+        </div>
+      ) : (
+        <TimetableGrid entries={entries} role="PARENT" />
+      )}
     </div>
   )
 }

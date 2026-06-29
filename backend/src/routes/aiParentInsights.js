@@ -160,7 +160,7 @@ Output ONLY a JSON object with two keys:
   // Gemini Fallback
   if (process.env.GEMINI_API_KEY) {
     try {
-      const res = await fetch(\`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=\${process.env.GEMINI_API_KEY}\`, {
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -183,7 +183,7 @@ Output ONLY a JSON object with two keys:
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': \`Bearer \${process.env.OPENAI_API_KEY}\`
+          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
         },
         body: JSON.stringify({
           model: 'gpt-4o-mini',
@@ -200,12 +200,12 @@ Output ONLY a JSON object with two keys:
   }
 
   // Deterministic Rule-Based Fallback
-  const explanation = \`${data.studentName} is demonstrating strong performance, particularly in \${data.strengths.join(' and ')}. Current progress is \${data.academicTrend.toLowerCase()}, with an attendance rate of \${data.attendanceHealth.score}%. \${data.weaknesses.length > 0 ? \`There is an opportunity for improvement in \${data.weaknesses.join(' and ')}, which can be an area of focus moving forward.\` : 'Consistency across all subjects is commendable.'} At this stage, the overall status is stable, and continuing current positive habits will support further development.\`
+  const explanation = `${data.studentName} is demonstrating strong performance, particularly in ${data.strengths.join(' and ')}. Current progress is ${data.academicTrend.toLowerCase()}, with an attendance rate of ${data.attendanceHealth.score}%. ${data.weaknesses.length > 0 ? `There is an opportunity for improvement in ${data.weaknesses.join(' and ')}, which can be an area of focus moving forward.` : 'Consistency across all subjects is commendable.'} At this stage, the overall status is stable, and continuing current positive habits will support further development.`
   
   const recommendations = [
     data.attendanceHealth.score < 85 ? 'Maintain a consistent morning routine to improve attendance habits.' : 'Continue maintaining excellent attendance habits.',
     data.missingHomeworkCount > 0 ? 'Set aside dedicated time each evening to review and complete pending assignments.' : 'Encourage 20 minutes of daily independent reading.',
-    data.weaknesses.length > 0 ? \`Spend 15-20 minutes reviewing \${data.weaknesses[0]} concepts together periodically.\` : 'Discuss upcoming topics and encourage intellectual curiosity.'
+    data.weaknesses.length > 0 ? `Spend 15-20 minutes reviewing ${data.weaknesses[0]} concepts together periodically.` : 'Discuss upcoming topics and encourage intellectual curiosity.'
   ]
 
   return { explanation, recommendations }
@@ -255,10 +255,10 @@ router.get('/:studentId/weekly-summary', protect, async (req, res) => {
       success: true,
       data: {
         weeklyProgress: data.academicTrend,
-        attendanceChanges: \`Attendance is currently \${data.attendanceHealth.status} (\${data.attendanceHealth.score}%)\`,
-        homeworkStatus: data.missingHomeworkCount === 0 ? 'All caught up' : \`\${data.missingHomeworkCount} pending assignments\`,
+        attendanceChanges: `Attendance is currently ${data.attendanceHealth.status} (${data.attendanceHealth.score}%)`,
+        homeworkStatus: data.missingHomeworkCount === 0 ? 'All caught up' : `${data.missingHomeworkCount} pending assignments`,
         recommendedActions: [
-          'Review this week\\'s completed homework together.',
+          'Review this week\'s completed homework together.',
           'Discuss what was learned in Science or English.',
           'Ensure uniform and backpack are ready for next week.'
         ]
@@ -293,21 +293,21 @@ router.get('/:studentId/pdf', protect, async (req, res) => {
     page.drawText('AI PARENT INSIGHT REPORT', { x: 180, y: height - 90, size: 14, font: boldFont })
     
     // Generation Date
-    page.drawText(\`Date: \${new Date().toLocaleDateString()}\`, { x: 450, y: height - 90, size: 10, font })
+    page.drawText(`Date: ${new Date().toLocaleDateString()}`, { x: 450, y: height - 90, size: 10, font })
 
     // Student Info
-    page.drawText(\`Student Name: \${data.studentName}\`, { x: 50, y: height - 130, size: 11, font })
-    page.drawText(\`Admission No: \${data.admissionNo || 'N/A'}\`, { x: 350, y: height - 130, size: 11, font })
-    page.drawText(\`Class: \${data.className} (\${data.division || ''})\`, { x: 50, y: height - 150, size: 11, font })
+    page.drawText(`Student Name: ${data.studentName}`, { x: 50, y: height - 130, size: 11, font })
+    page.drawText(`Admission No: ${data.admissionNo || 'N/A'}`, { x: 350, y: height - 130, size: 11, font })
+    page.drawText(`Class: ${data.className} (${data.division || ''})`, { x: 50, y: height - 150, size: 11, font })
     
     page.drawLine({ start: { x: 50, y: height - 170 }, end: { x: 550, y: height - 170 }, thickness: 1 })
 
     // Metrics
-    page.drawText(\`Academic Health Score: \${data.academicHealthScore}/100\`, { x: 50, y: height - 195, size: 11, font: boldFont })
-    page.drawText(\`Risk Level: \${data.riskLevel}\`, { x: 350, y: height - 195, size: 11, font: boldFont, color: data.riskLevel === 'HIGH' ? rgb(0.8, 0.1, 0.1) : rgb(0.1, 0.6, 0.1) })
+    page.drawText(`Academic Health Score: ${data.academicHealthScore}/100`, { x: 50, y: height - 195, size: 11, font: boldFont })
+    page.drawText(`Risk Level: ${data.riskLevel}`, { x: 350, y: height - 195, size: 11, font: boldFont, color: data.riskLevel === 'HIGH' ? rgb(0.8, 0.1, 0.1) : rgb(0.1, 0.6, 0.1) })
     
-    page.drawText(\`Attendance: \${data.attendanceHealth.score}% (\${data.attendanceHealth.status})\`, { x: 50, y: height - 215, size: 11, font })
-    page.drawText(\`Future Readiness Index: \${data.futureReadinessIndex}/100\`, { x: 350, y: height - 215, size: 11, font })
+    page.drawText(`Attendance: ${data.attendanceHealth.score}% (${data.attendanceHealth.status})`, { x: 50, y: height - 215, size: 11, font })
+    page.drawText(`Future Readiness Index: ${data.futureReadinessIndex}/100`, { x: 350, y: height - 215, size: 11, font })
 
     page.drawLine({ start: { x: 50, y: height - 235 }, end: { x: 550, y: height - 235 }, thickness: 1 })
 
@@ -334,7 +334,7 @@ router.get('/:studentId/pdf', protect, async (req, res) => {
     page.drawText('PARENT ACTION PLAN', { x: 50, y: yPos, size: 12, font: boldFont })
     aiResult.recommendations.forEach(r => {
       yPos -= 20
-      page.drawText(\`• \${r}\`, { x: 60, y: yPos, size: 10, font })
+      page.drawText(`• ${r}`, { x: 60, y: yPos, size: 10, font })
     })
 
     // Footer
@@ -342,7 +342,7 @@ router.get('/:studentId/pdf', protect, async (req, res) => {
 
     const pdfBytes = await pdfDoc.save()
     res.setHeader('Content-Type', 'application/pdf')
-    res.setHeader('Content-Disposition', \`attachment; filename=ParentInsightReport_\${data.studentName}.pdf\`)
+    res.setHeader('Content-Disposition', `attachment; filename=ParentInsightReport_${data.studentName}.pdf`)
     res.send(Buffer.from(pdfBytes))
   } catch (error) {
     res.status(500).json({ success: false, message: error.message })
@@ -384,10 +384,10 @@ router.get('/:studentId/widget', protect, async (req, res) => {
     let colorCode = "green"
 
     if (data.riskLevel === 'HIGH') {
-      statusMsg = \`\${data.weaknesses[0] || 'Academics'} Requires Attention\`
+      statusMsg = `${data.weaknesses[0] || 'Academics'} Requires Attention`
       colorCode = "red"
     } else if (data.riskLevel === 'MEDIUM') {
-      statusMsg = \`Needs Additional \${data.weaknesses[0] || 'Study'} Practice\`
+      statusMsg = `Needs Additional ${data.weaknesses[0] || 'Study'} Practice`
       colorCode = "yellow"
     }
 

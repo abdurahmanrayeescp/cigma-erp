@@ -11,8 +11,8 @@ const cap = (n, max = 100) => Math.min(Math.max(Number(n) || 20, 1), max)
 router.post('/', async (req, res) => {
   try {
     const { name, email, phone, parentName, grade, subject, message, type } = req.body
-    if (!name || !phone || !message) {
-      return res.status(400).json({ success: false, message: 'Name, phone, and message are required' })
+    if (!name || !phone) {
+      return res.status(400).json({ success: false, message: 'Name and phone are required' })
     }
     const inquiry = await Inquiry.create({
       name, email, phone, parentName, grade, subject, message,

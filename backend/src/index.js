@@ -71,13 +71,21 @@ app.use(helmet({
 }))
 
 app.use(cors({
-  origin: [
-    'https://creativecigma.com',
-    'https://portal.creativecigma.com',
-    'https://admin.creativecigma.com',
-    'http://localhost:5173',
-    'http://localhost:3000',
-  ],
+  origin: function (origin, callback) {
+    const allowedOrigins = [
+      'https://creativecigma.com',
+      'https://portal.creativecigma.com',
+      'https://admin.creativecigma.com',
+      'http://localhost:5173',
+      'http://localhost:3000',
+    ];
+    // Allow if origin is in the list, or it's a vercel preview domain, or no origin (e.g. server-to-server)
+    if (!origin || allowedOrigins.includes(origin) || /\.vercel\.app$/.test(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
 }))

@@ -108,7 +108,7 @@ const inquirySchema = new mongoose.Schema({
   parentName: String,
   grade: String,
   subject: String,
-  message: { type: String, required: true },
+  message: { type: String },
   type: { type: String, enum: ['admission', 'general', 'contact'], default: 'general' },
   status: { type: String, enum: ['new', 'contacted', 'resolved'], default: 'new' },
   notes: String,

@@ -46,6 +46,8 @@ export default function Login() {
         navigate('/portal/parent')
       } else if (role === 'STUDENT') {
         navigate('/portal/student')
+      } else if (role === 'ACCOUNTANT') {
+        navigate('/portal/admin/fees')
       } else {
         navigate('/')
       }

@@ -26,9 +26,10 @@ export const generateTransferCertificate = async (req, res) => {
       x: 200, y: height - 120, size: 16, font: helveticaBold
     })
 
+    const classNameStr = typeof student.class === 'object' ? (student.class?.className || 'N/A') : (student.class || 'N/A')
     page.drawText(`This is to certify that ${student.name}`, { x: 50, y: height - 200, size: 12, font: helveticaFont })
     page.drawText(`Admission No: ${student.admissionNo}`, { x: 50, y: height - 230, size: 12, font: helveticaFont })
-    page.drawText(`Was a student of this school in Class: ${student.class.className}`, { x: 50, y: height - 260, size: 12, font: helveticaFont })
+    page.drawText(`Was a student of this school in Class: ${classNameStr}`, { x: 50, y: height - 260, size: 12, font: helveticaFont })
     page.drawText(`Date of Leaving: ${dateOfLeaving}`, { x: 50, y: height - 290, size: 12, font: helveticaFont })
     page.drawText(`Reason for leaving: ${reason}`, { x: 50, y: height - 320, size: 12, font: helveticaFont })
     
@@ -68,7 +69,8 @@ export const generateBonafideCertificate = async (req, res) => {
       x: 200, y: height - 120, size: 16, font: helveticaBold
     })
 
-    const text = `This is to certify that ${student.name}, Admission No ${student.admissionNo}, is a bonafide student of our institution currently studying in Class ${student.class.className}.`
+    const classNameStr = typeof student.class === 'object' ? (student.class?.className || 'N/A') : (student.class || 'N/A')
+    const text = `This is to certify that ${student.name}, Admission No ${student.admissionNo}, is a bonafide student of our institution currently studying in Class ${classNameStr}.`
     
     page.drawText(text, { x: 50, y: height - 220, size: 12, font: helveticaFont, maxWidth: 500, lineHeight: 20 })
     page.drawText(`Purpose: ${purpose}`, { x: 50, y: height - 280, size: 12, font: helveticaFont })

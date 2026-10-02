@@ -35,7 +35,6 @@ import systemRoutes from './routes/system.js'
 import parentRoutes from './routes/parents.js'
 import aiStudyPlanRoutes from './routes/aiStudyPlan.js'
 import aiParentInsightsRoutes from './routes/aiParentInsights.js'
-import aiRoutes from './routes/aiStudyPlan.js'
 
 dotenv.config()
 
@@ -79,6 +78,9 @@ app.use(cors({
       'http://localhost:5173',
       'http://localhost:3000',
     ];
+    if (process.env.FRONTEND_URL) {
+      allowedOrigins.push(process.env.FRONTEND_URL);
+    }
     // Allow if origin is in the list, or it's a vercel preview domain, or no origin (e.g. server-to-server)
     if (!origin || allowedOrigins.includes(origin) || /\.vercel\.app$/.test(origin)) {
       callback(null, true);
@@ -148,7 +150,6 @@ app.use('/api/system', systemRoutes)
 app.use('/api/parents', parentRoutes)
 app.use('/api/ai', aiStudyPlanRoutes)
 app.use('/api/ai/parent-insights', aiParentInsightsRoutes)
-app.use('/api/ai', aiRoutes)
 
 // Health check
 app.get('/api/health', (_req, res) => {

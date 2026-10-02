@@ -141,7 +141,7 @@ function AppRoutes() {
         {/* ERP Portal */}
         <Route path="/portal" element={<ProtectedRoute />}>
           <Route element={<DashboardLayout />}>
-            <Route path="admin" element={<ProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN']} />}>
+            <Route path="admin" element={<ProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN', 'ACCOUNTANT']} />}>
               <Route index element={<AdminDashboard />} />
               <Route path="students" element={<AdminStudentsPage />} />
               <Route path="teachers" element={<AdminTeachersPage />} />

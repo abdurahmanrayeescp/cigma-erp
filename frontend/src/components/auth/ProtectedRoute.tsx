@@ -28,6 +28,7 @@ export default function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
     if (user.role === 'TEACHER') return <Navigate to="/portal/teacher" replace />
     if (user.role === 'PARENT') return <Navigate to="/portal/parent" replace />
     if (user.role === 'STUDENT') return <Navigate to="/portal/student" replace />
+    if (user.role === 'ACCOUNTANT') return <Navigate to="/portal/admin/fees" replace />
     
     return <Navigate to="/" replace />
   }

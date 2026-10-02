@@ -2,10 +2,10 @@ services:
   - type: web
     name: cigma-backend
     env: node
-    plan: free
     rootDir: backend
     buildCommand: npm install
     startCommand: npm start
+    healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
         value: production
@@ -14,26 +14,26 @@ services:
       - key: MONGODB_URI
         sync: false
       - key: JWT_SECRET
-        generateValue: true
+        sync: false
       - key: JWT_REFRESH_SECRET
-        generateValue: true
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
       - key: CLOUDINARY_CLOUD_NAME
         sync: false
       - key: CLOUDINARY_API_KEY
         sync: false
       - key: CLOUDINARY_API_SECRET
         sync: false
-      - key: EMAIL_HOST
+      - key: SMTP_HOST
         sync: false
-      - key: EMAIL_PORT
+      - key: SMTP_PORT
         sync: false
-      - key: EMAIL_USER
+      - key: SMTP_USER
         sync: false
-      - key: EMAIL_PASS
+      - key: SMTP_PASSWORD
         sync: false
-      - key: FIREBASE_PROJECT_ID
+      - key: SMTP_FROM
         sync: false
-      - key: FIREBASE_CLIENT_EMAIL
-        sync: false
-      - key: FIREBASE_PRIVATE_KEY
+      - key: GEMINI_API_KEY
         sync: false
